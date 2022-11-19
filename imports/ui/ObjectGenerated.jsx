@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTracker } from 'meteor/react-meteor-data';
 import { UnsortedObjectsCollection } from '../db/UnsortedObjectsCollection';
-import { GenerateNewObject } from './GenerateNewObject';
 import { DeleteObject } from './components/DeleteObject';
 
 export const ObjectGenerated = () => {
@@ -15,7 +14,7 @@ export const ObjectGenerated = () => {
 
     const k = 1024
     const dm = decimals < 0 ? 0 : decimals
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    const sizes = ['Bytes', 'KB', 'MB']
 
     const i = Math.floor(Math.log(bytes) / Math.log(k))
 
@@ -27,14 +26,15 @@ export const ObjectGenerated = () => {
       <h2>Your generated objects</h2>
       <ul>{unsortedObjects.map(
         unsortedObject => <li key={unsortedObject._id}>
-            <p>{unsortedObject.keyCount} keys</p>
-            <p>{unsortedObject.depth} depth</p>
-            <p>{formatObjectSize(unsortedObject.size)}</p>
-            <p>{unsortedObject.generationTime} ms</p>
-            <DeleteObject objectGenerated={unsortedObject} />
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr'}}>
+            <div style={{gridColumn: '1/1'}}>{unsortedObject.keyCount} keys</div>
+            <div style={{gridColumn: '2/2'}}>{unsortedObject.depth} depth</div>
+            <div style={{gridColumn: '3/3'}}>{formatObjectSize(unsortedObject.size)}</div>
+            <div style={{gridColumn: '4/4'}}>{unsortedObject.generationTime} ms</div>
+            <div style={{gridColumn: '5/5'}}><DeleteObject objectGenerated={unsortedObject} /></div>
+            </div>
         </li>
       )}</ul>
-      <GenerateNewObject />
     </div>
   );
 };
