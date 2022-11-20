@@ -91,7 +91,7 @@ export const sortAndUpdate = (unsortedObject) => {
     return SortStatsCollection.findOne(sortStatsId);
 }
 
-const sortObjectByKey = (obj) => {
+export const sortObjectByKey = (obj) => {
     return Object.keys(obj).sort().reduce((result, key) => {
         if (typeof obj[key] != "object" || !obj[key] instanceof Array) {
             result[key] = obj[key];
