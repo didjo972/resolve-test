@@ -12,7 +12,7 @@ Meteor.methods({
             .mapAsync(sortStat => sortStat);
         return result;
     } catch (err) {
-        return console.log(err);
+        console.log(err);
     }
   }
 });
