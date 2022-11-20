@@ -1,5 +1,8 @@
 import sizeof from 'object-sizeof';
 
+import { UnsortedObjectsCollection } from '../db/UnsortedObjectsCollection';
+import { SortStatsCollection } from '../db/SortStatsCollection';
+
 export const generateObject = (rootKeyCount, maxDepth) => {
     let nbKey = 0;
     let nbDepth = 0;
@@ -44,17 +47,11 @@ const initializeValue = (parentRootKeyCount, parentMaxDepth, increaseKey, increa
     }
 }
 
-const selectTypeRandomly = () => {
-    return typeOfKey[getRndInteger(0, typeOfKey.length)];
-};
+const selectTypeRandomly = () => typeOfKey[getRndInteger(0, typeOfKey.length)];
 
-function getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min) ) + min;
-};
+const getRndInteger = (min, max) => Math.floor(Math.random() * (max - min) ) + min;
 
-const generateKeyRandomly = () => {
-    return generateStringOrNumber(characters);
-}
+const generateKeyRandomly = () => generateStringOrNumber(characters);
 
 const generateStringOrNumber = (from) => {
     let value = '';
@@ -64,6 +61,35 @@ const generateStringOrNumber = (from) => {
     return value;
 }
 
-const generateBoolean = () => {
-    return getRndInteger(0, 1) === 1;
+const generateBoolean = () => getRndInteger(0, 1) === 1;
+
+export const sortAndUpdate = (unsortedObject) => {
+    const start = new Date();
+    const sortedObj = sortObjectByKey(unsortedObject.object);
+    const end = new Date();
+
+    UnsortedObjectsCollection.update(
+    unsortedObject._id, {
+        $set: {
+        object: sortedObj
+        }
+    });
+    
+    const sortStatsId = SortStatsCollection.insert({
+    objectId: unsortedObject._id,
+    sortDuration: end.getTime()-start.getTime()
+    });
+
+    return SortStatsCollection.findOne(sortStatsId);
+}
+
+const sortObjectByKey = (obj) => {
+    return Object.keys(obj).sort().reduce((result, key) => {
+        if (typeof obj[key] != "object" || !obj[key] instanceof Array) {
+            result[key] = obj[key];
+        } else {
+            result[key] = sortObjectByKey(obj[key]);
+        }
+        return result;
+      }, {});
 }

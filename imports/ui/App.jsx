@@ -7,7 +7,9 @@ export const App = () => (
   <div>
     <h1>Welcome to my first Meteor App !</h1>
     <h2>Let's start building a random object</h2>
-    <div style={{ display: 'flex' }}><ObjectGenerated />
-    <GenerateNewObject /></div>
+    <div style={{ display: 'flex' }}>
+      <ObjectGenerated />
+      <GenerateNewObject />
+    </div>
   </div>
 );

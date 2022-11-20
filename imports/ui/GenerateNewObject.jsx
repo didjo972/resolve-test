@@ -7,16 +7,27 @@ export const GenerateNewObject = () => {
 
   const [amountKeysAtRoot, setAmountKeysAtRoot] = useState(0);
   const [amountNestedObject, setAmountNestedObject] = useState(0);
+  const [isGenerating, setIsGenerating] = useState(false);
     
   const handleSubmit = e => {
+    setIsGenerating(true);
     e.preventDefault();
 
     if (amountKeysAtRoot <= 0) return;
     
-    Meteor.call('unsortedObject.generate', +amountKeysAtRoot, +amountNestedObject);
-
-    setAmountKeysAtRoot(0);
-    setAmountNestedObject(0);
+    Meteor.call(
+      'unsortedObject.generate', 
+      +amountKeysAtRoot, 
+      +amountNestedObject, 
+      (error, result) => {
+        if (error) {
+          alert('An error occured trying create an object');
+        }
+        setIsGenerating(false);
+        setAmountKeysAtRoot(0);
+        setAmountNestedObject(0);
+      }
+    );
   };
 
   return (
@@ -37,7 +48,7 @@ export const GenerateNewObject = () => {
         />
         <p><AlertObjectSize amountKeysAtRoot={+amountKeysAtRoot} amountNestedObject={+amountNestedObject} /></p>
 
-        <button type="submit">Generate object</button>
+        <button disabled={isGenerating} type="submit">Generate object</button>
       </form>
     </div>
   );

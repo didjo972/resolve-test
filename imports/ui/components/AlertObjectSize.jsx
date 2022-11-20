@@ -1,12 +1,9 @@
-import { Meteor } from 'meteor/meteor';
 import React, { useEffect, useState } from 'react';
 
 export const AlertObjectSize = ({ amountKeysAtRoot, amountNestedObject }) => {
     const [showAlertSize, setShowAlertSize] = useState(false);
 
     useEffect(() => {
-        console.log(showAlertSize);
-        console.log(amountKeysAtRoot + amountNestedObject);
         if (amountKeysAtRoot + amountNestedObject >= 250) {
             setShowAlertSize(true);
         } else {
