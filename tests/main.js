@@ -1,4 +1,5 @@
 import assert from "assert";
+import '/imports/api/unsortedObjectsMethods.tests.js';
 
 describe("resolve-test", function () {
   it("package.json has correct name", async function () {
