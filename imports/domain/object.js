@@ -3,25 +3,30 @@ import sizeof from 'object-sizeof';
 import { UnsortedObjectsCollection } from '../db/UnsortedObjectsCollection';
 import { SortStatsCollection } from '../db/SortStatsCollection';
 
-export const generateObject = (rootKeyCount, maxDepth) => {
-    let nbKey = 0;
-    let nbDepth = 0;
+export const generator = (rootKeyCount, maxDepth) => {
+    let nbTotalKey = 0;
+    let nbTotalDepth = 0;
 
-    const increaseKey = () => nbKey++;
-    const increaseDepth = () => nbDepth++;
+    const increaseTotalKey = () => {nbTotalKey++};
+    const setNbTotalDepth = (newTotalDepth) => {nbTotalDepth = newTotalDepth > nbTotalDepth ? newTotalDepth : nbTotalDepth};
 
     const start = new Date();
-    const obj = generator(rootKeyCount, maxDepth, increaseKey, increaseDepth);
+    const obj = generateObject(rootKeyCount, maxDepth, increaseTotalKey, setNbTotalDepth, undefined);
     const end = new Date();
-    return { object: obj, keyCount: nbKey, depth: nbDepth, size: sizeof(obj), generationTime: end.getTime()-start.getTime()};
+    return { object: obj, keyCount: nbTotalKey, depth: nbTotalDepth, size: sizeof(obj), generationTime: end.getTime()-start.getTime()};
 };
 
-const generator = (rootKeyCount, maxDepth, increaseKey, increaseDepth, depth=1) => {
+const generateObject = (rootKeyCount, maxDepth, increaseTotalKey, setNbTotalDepth, nbNestedObj) => {
     const generatedObject = {};
-    increaseDepth();
     for(let i=0; i<rootKeyCount; i++) {
-        increaseKey();
-        generatedObject[generateKeyRandomly()] = initializeValue(rootKeyCount, maxDepth, increaseKey, increaseDepth, depth);
+        let nbNested = nbNestedObj ? nbNestedObj : 0;
+        const increaseNbNested = () => {
+            nbNested++;
+            return nbNested; 
+        };
+        increaseTotalKey();
+        generatedObject[generateKeyRandomly()] = initializeValue(rootKeyCount, maxDepth, increaseTotalKey, increaseNbNested, setNbTotalDepth, nbNested);
+        setNbTotalDepth(nbNested);
     }
     return generatedObject;
 }
@@ -30,14 +35,17 @@ const typeOfKey = ['number', 'string', 'object', 'boolean', 'array'];
 const characters = 'abcdefghijklmnopqrstuvwxyz';
 const numbers = '0123456789';
 
-const initializeValue = (parentRootKeyCount, parentMaxDepth, increaseKey, increaseDepth, depth) => {
+const initializeValue = (parentRootKeyCount, maxDepth, increaseTotalKey, increaseNbNestedObj, setNbTotalDepth, nbNested) => {
     switch (selectTypeRandomly()) {
         case 'number':
             return generateStringOrNumber(numbers);
         case 'string':
             return generateStringOrNumber(characters);
         case 'object':
-            return depth === parentMaxDepth ? {} : generator(parentRootKeyCount/2, parentMaxDepth, increaseKey, increaseDepth, depth+1);
+            if (nbNested >= maxDepth) {
+                return {};
+            }
+            return generateObject(parentRootKeyCount/2, maxDepth, increaseTotalKey, setNbTotalDepth, increaseNbNestedObj());        
         case 'boolean':
             return generateBoolean();
         case 'array':

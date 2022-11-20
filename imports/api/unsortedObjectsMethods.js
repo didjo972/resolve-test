@@ -1,13 +1,13 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { UnsortedObjectsCollection } from '../db/UnsortedObjectsCollection';
-import { generateObject, sortAndUpdate } from '../domain/object';
+import { generator, sortAndUpdate } from '../domain/object';
 
 Meteor.methods({
     'unsortedObject.generate'(rootKeyCount, maxDepth) {
         check(rootKeyCount, Number);
         check(maxDepth, Number);
-        UnsortedObjectsCollection.insert(generateObject(rootKeyCount, maxDepth));
+        UnsortedObjectsCollection.insert(generator(rootKeyCount, maxDepth));
     },
 
     'unsortedObject.delete'(_id) {
